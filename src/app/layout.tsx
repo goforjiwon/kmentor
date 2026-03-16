@@ -1,0 +1,25 @@
+import type { Metadata } from "next";
+import { Noto_Sans_KR } from "next/font/google";
+import "./globals.css";
+
+const notoSansKr = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+export const metadata: Metadata = {
+  title: "KMentor — 충북 KAIST 멘토 매칭",
+  description: "충북 지역 전용 KAIST 재학생 수학·과학 1:1 멘토 매칭 서비스. 학부모 수수료 0원.",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="ko">
+      <body className={notoSansKr.className}>{children}</body>
+    </html>
+  );
+}
