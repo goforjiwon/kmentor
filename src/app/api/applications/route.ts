@@ -6,21 +6,24 @@ const SHEETS_WEBHOOK_URL =
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as ApplicationPayload;
+    const payload = (await request.json()) as ApplicationPayload;
+
+    // 수신 직후 원본 payload를 기록해, 한국어 텍스트가 서버에서 이미 변형되는지 먼저 확인한다.
+    console.log("[applications] incoming payload:", JSON.stringify(payload));
 
     // 필수 필드 검증
-    if (!body.parentName || !body.phone || !body.grade) {
+    if (!payload.parentName || !payload.phone || !payload.grade) {
       return NextResponse.json(
         { success: false, message: "필수 항목을 입력해주세요." },
         { status: 400 }
       );
     }
 
-    // Google Sheets 웹훅으로 전송
+    // Google Sheets 웹훅으로 payload 원문 그대로 전송
     const sheetsRes = await fetch(SHEETS_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
 
     if (!sheetsRes.ok) {
@@ -34,7 +37,7 @@ export async function POST(request: Request) {
     }
 
     try {
-      await sendApplicationEmail(body);
+      await sendApplicationEmail(payload);
     } catch (err) {
       console.error("이메일 전송 오류:", err);
     }
