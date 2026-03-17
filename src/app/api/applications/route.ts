@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
+import { sendApplicationEmail, type ApplicationPayload } from "@/lib/email";
 
 const SHEETS_WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbyidUcRODADemH6Waa_FE6ThQLIc98ck5p6tZ0J5XA-wcGWEsegsTc9pidPhf_J5tykIw/exec";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as ApplicationPayload;
 
     // 필수 필드 검증
     if (!body.parentName || !body.phone || !body.grade) {
@@ -30,6 +31,12 @@ export async function POST(request: Request) {
 
     if (!json.success) {
       throw new Error(json.error ?? "Sheets 저장 실패");
+    }
+
+    try {
+      await sendApplicationEmail(body);
+    } catch (err) {
+      console.error("이메일 전송 오류:", err);
     }
 
     return NextResponse.json({ success: true }, { status: 201 });
