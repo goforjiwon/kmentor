@@ -37,8 +37,8 @@ const WHY = [
     desc: "한 명이 맞지 않으면 다른 멘토를 다시 연결해드립니다. 자녀에게 딱 맞는 멘토를 찾을 때까지 제한 없이 만나볼 수 있습니다.",
   },
   {
-    title: "충북 지역 특화",
-    desc: "충북 지역 학생의 교육 환경과 내신·수능 특성을 이해하는 멘토 위주로 연결합니다.",
+    title: "세종 지역 특화",
+    desc: "세종 지역 학생의 교육 환경과 내신·수능 특성을 이해하는 멘토 위주로 연결합니다.",
   },
 ];
 
@@ -62,7 +62,7 @@ export default function HomePage() {
       <section className="py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto text-center">
           <div className="flex flex-wrap justify-center gap-2 mb-6">
-            {["학부모 수수료 0원", "KAIST 재학생 멘토", "충북 지역 전용", "수학·과학 전문"].map((tag) => (
+            {["학부모 수수료 0원", "KAIST 재학생 멘토", "세종 지역 전용", "수학·과학 전문"].map((tag) => (
               <span
                 key={tag}
                 className="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full"
@@ -73,7 +73,7 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 leading-tight mb-5">
-            충북 지역 전용,
+            세종 지역 전용,
             <br />
             <span className="text-blue-600">검증된 KAIST 재학생</span>
             <br />
@@ -162,7 +162,7 @@ export default function HomePage() {
 
       {/* 푸터 */}
       <footer className="border-t py-6 px-4 text-center text-xs text-slate-400">
-        © 2025 KMentor — 충북 KAIST 멘토 매칭 ·{" "}
+        © 2025 KMentor — 세종 KAIST 멘토 매칭 ·{" "}
         <a
           href="https://www.perplexity.ai/computer"
           target="_blank"
