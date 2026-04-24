@@ -14,7 +14,7 @@ export type ApplicationPayload = {
 
 const RESEND_API_URL = "https://api.resend.com/emails";
 const EMAIL_TO = "goforjiwon@gmail.com";
-const EMAIL_SUBJECT = "[KMentor] 신규 신청";
+const EMAIL_SUBJECT = "[카이멘토 | KAIMentor] 신규 신청";
 
 const SUBJECT_LABELS: Record<string, string> = {
   math: "수학",
@@ -47,7 +47,7 @@ function emptyFallback(value: string) {
 
 function makeTextBody(payload: ApplicationPayload) {
   return [
-    "KMentor 신규 신청이 접수되었습니다.",
+    "카이멘토(KAIMentor) 신규 신청이 접수되었습니다.",
     "",
     `- 학부모님 성함: ${emptyFallback(payload.parentName)}`,
     `- 연락처: ${emptyFallback(payload.phone)}`,
@@ -80,7 +80,7 @@ function makeHtmlBody(payload: ApplicationPayload) {
 
   return `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
-      <h2 style="margin-bottom: 16px;">KMentor 신규 신청</h2>
+      <h2 style="margin-bottom: 16px;">카이멘토 (KAIMentor) 신규 신청</h2>
       <table style="border-collapse: collapse; width: 100%; max-width: 720px;">
         ${rows
           .map(

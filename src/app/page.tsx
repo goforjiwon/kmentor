@@ -48,7 +48,7 @@ export default function HomePage() {
       {/* 헤더 */}
       <header className="border-b bg-white sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <span className="font-bold text-blue-700 text-lg tracking-tight">KMentor</span>
+          <span className="font-bold text-blue-700 text-lg tracking-tight">카이멘토</span>
           <Link
             href="/apply"
             className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
@@ -121,11 +121,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 왜 KMentor */}
+      {/* 왜 카이멘토(KAIMentor) */}
       <section className="py-14 sm:py-20 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8">
-            왜 KMentor인가요?
+            왜 카이멘토(KAIMentor)인가요?
           </h2>
           <div className="space-y-3">
             {WHY.map((item) => (
@@ -162,7 +162,7 @@ export default function HomePage() {
 
       {/* 푸터 */}
       <footer className="border-t py-6 px-4 text-center text-xs text-slate-400">
-        © 2025 KMentor — 세종 KAIST 멘토 매칭 ·{" "}
+        © 2025 카이멘토 (KAIMentor) — 세종 KAIST 멘토 매칭 ·{" "}
         <a
           href="https://www.perplexity.ai/computer"
           target="_blank"

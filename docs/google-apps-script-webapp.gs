@@ -1,5 +1,5 @@
 /**
- * KMentor Google Apps Script Web App (권장 예시)
+ * 카이멘토 (KAIMentor) Google Apps Script Web App (권장 예시)
  *
  * 목적:
  * 1) 번역 로직(LanguageApp.translate, GOOGLETRANSLATE 수식 주입, 외부 번역 API) 미사용
