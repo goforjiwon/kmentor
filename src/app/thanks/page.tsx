@@ -76,7 +76,7 @@ export default function ThanksPage() {
       </main>
 
       <footer className="border-t py-5 px-4 text-center text-xs text-slate-400">
-        © 2025 KMentor ·{" "}
+        © 2025 카이멘토 (KAIMentor) ·{" "}
         <a
           href="https://www.perplexity.ai/computer"
           target="_blank"
