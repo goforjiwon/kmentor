@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sendApplicationEmail, type ApplicationPayload } from "@/lib/email";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendKakaoSelfMessage } from "@/lib/kakao";
+import { sendTelegramNotification } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -44,11 +45,24 @@ export async function POST(request: Request) {
 
     console.log("[applications] 저장 완료 id:", data?.id);
 
-    // 2) 알림 전송 (실패해도 신청 자체는 성공 — DB에 이미 들어감)
-    const [emailResult, kakaoResult] = await Promise.allSettled([
+    // 2) 알림 전송 — 모든 채널을 병렬 시도. 실패해도 신청 자체는 성공 — DB에 이미 들어감.
+    const [emailResult, kakaoResult, telegramResult] = await Promise.allSettled([
       sendApplicationEmail(payload),
       sendKakaoSelfMessage(payload),
+      sendTelegramNotification(payload),
     ]);
+
+    function unwrap(
+      result: PromiseSettledResult<unknown>
+    ): Record<string, unknown> {
+      if (result.status === "fulfilled") {
+        return (result.value as Record<string, unknown>) ?? { sent: true };
+      }
+      return {
+        sent: false,
+        reason: String((result.reason as Error)?.message ?? result.reason),
+      };
+    }
 
     const notifications = {
       email:
@@ -60,15 +74,8 @@ export async function POST(request: Request) {
                 (emailResult.reason as Error)?.message ?? emailResult.reason
               ),
             },
-      kakao:
-        kakaoResult.status === "fulfilled"
-          ? kakaoResult.value
-          : {
-              sent: false,
-              reason: String(
-                (kakaoResult.reason as Error)?.message ?? kakaoResult.reason
-              ),
-            },
+      kakao: unwrap(kakaoResult),
+      telegram: unwrap(telegramResult),
     };
 
     if (!notifications.email.ok) {
