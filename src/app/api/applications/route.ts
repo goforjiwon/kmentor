@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 import { sendApplicationEmail, type ApplicationPayload } from "@/lib/email";
-
-const SHEETS_WEBHOOK_URL =
-  "https://script.google.com/macros/s/AKfycbyidUcRODADemH6Waa_FE6ThQLIc98ck5p6tZ0J5XA-wcGWEsegsTc9pidPhf_J5tykIw/exec";
+import { supabaseAdmin } from "@/lib/supabase";
+import { sendKakaoSelfMessage } from "@/lib/kakao";
 
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as ApplicationPayload;
 
-    // 수신 직후 원본 payload를 기록해, 한국어 텍스트가 서버에서 이미 변형되는지 먼저 확인한다.
+    // 수신 직후 원본 payload 로그 (디버깅용)
     console.log("[applications] incoming payload:", JSON.stringify(payload));
 
     // 필수 필드 검증
@@ -19,34 +18,54 @@ export async function POST(request: Request) {
       );
     }
 
-    // Google Sheets 웹훅으로 payload 원문 그대로 전송
-    const sheetsRes = await fetch(SHEETS_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+    // 1) Supabase에 저장 (최우선 — 실패 시 전체 실패)
+    const { data, error } = await supabaseAdmin
+      .from("applications")
+      .insert({
+        parent_name: payload.parentName,
+        phone: payload.phone,
+        grade: payload.grade,
+        subjects: payload.subjects ?? [],
+        current_level: payload.currentLevel ?? "",
+        difficulties: payload.difficulties ?? "",
+        goal: payload.goal ?? "",
+        goal_date: payload.goalDate ?? "",
+        child_personality: payload.childPersonality ?? [],
+        mentor_priority: payload.mentorPriority ?? "",
+        extra_note: payload.extraNote ?? "",
+        status: "new",
+      })
+      .select("id")
+      .single();
+
+    if (error) {
+      console.error("[applications] Supabase insert 오류:", error);
+      throw new Error(`DB 저장 실패: ${error.message}`);
+    }
+
+    console.log("[applications] 저장 완료 id:", data?.id);
+
+    // 2) 알림 전송 (실패해도 신청은 성공으로 처리 — 데이터는 DB에 이미 있음)
+    const notificationResults = await Promise.allSettled([
+      sendApplicationEmail(payload),
+      sendKakaoSelfMessage(payload),
+    ]);
+
+    notificationResults.forEach((result, idx) => {
+      const channel = idx === 0 ? "email" : "kakao";
+      if (result.status === "rejected") {
+        console.error(`[applications] ${channel} 알림 실패:`, result.reason);
+      }
     });
 
-    if (!sheetsRes.ok) {
-      throw new Error(`Sheets 웹훅 오류: ${sheetsRes.status}`);
-    }
-
-    const json = (await sheetsRes.json()) as { success: boolean; error?: string };
-
-    if (!json.success) {
-      throw new Error(json.error ?? "Sheets 저장 실패");
-    }
-
-    try {
-      await sendApplicationEmail(payload);
-    } catch (err) {
-      console.error("이메일 전송 오류:", err);
-    }
-
-    return NextResponse.json({ success: true }, { status: 201 });
+    return NextResponse.json({ success: true, id: data?.id }, { status: 201 });
   } catch (error) {
     console.error("신청 처리 오류:", error);
     return NextResponse.json(
-      { success: false, message: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요." },
+      {
+        success: false,
+        message: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+      },
       { status: 500 }
     );
   }
