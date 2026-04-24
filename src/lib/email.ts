@@ -16,33 +16,12 @@ const RESEND_API_URL = "https://api.resend.com/emails";
 const EMAIL_TO = "goforjiwon@gmail.com";
 const EMAIL_SUBJECT = "[카이멘토 | KAIMentor] 신규 신청";
 
-const SUBJECT_LABELS: Record<string, string> = {
-  math: "수학",
-  science: "과학",
-};
-
-const PERSONALITY_LABELS: Record<string, string> = {
-  introverted: "내성적인 편",
-  extroverted: "외향적인 편",
-  easily_tired: "쉽게 지치는 편",
-  perfectionist: "완벽주의 성향",
-  talkative: "말이 많은 편",
-  quiet: "조용한 편",
-};
-
-const MENTOR_PRIORITY_LABELS: Record<string, string> = {
-  concept: "수학·과학 개념 설명·문제풀이",
-  routine: "공부 방법·루틴 잡기",
-  motivation: "멘탈 관리·동기 부여",
-  career: "진로·대학(이공계) 이야기",
-};
-
-function toLabel(values: string[], labels: Record<string, string>) {
-  return values.map((value) => labels[value] ?? value).join(", ");
-}
-
 function emptyFallback(value: string) {
   return value.trim() || "(미입력)";
+}
+
+function joinOrEmpty(values: string[], emptyText = "(미선택)") {
+  return values.length > 0 ? values.join(", ") : emptyText;
 }
 
 function makeTextBody(payload: ApplicationPayload) {
@@ -52,13 +31,13 @@ function makeTextBody(payload: ApplicationPayload) {
     `- 학부모님 성함: ${emptyFallback(payload.parentName)}`,
     `- 연락처: ${emptyFallback(payload.phone)}`,
     `- 학년: ${emptyFallback(payload.grade)}`,
-    `- 도움이 필요한 과목: ${toLabel(payload.subjects, SUBJECT_LABELS) || "(미선택)"}`,
+    `- 도움이 필요한 과목: ${joinOrEmpty(payload.subjects)}`,
     `- 현재 성적·수준: ${emptyFallback(payload.currentLevel)}`,
     `- 어려워하는 부분: ${emptyFallback(payload.difficulties)}`,
     `- 목표: ${emptyFallback(payload.goal)}`,
     `- 목표 시점: ${emptyFallback(payload.goalDate)}`,
-    `- 자녀 성향: ${toLabel(payload.childPersonality, PERSONALITY_LABELS) || "(미선택)"}`,
-    `- 멘토에게 바라는 점: ${MENTOR_PRIORITY_LABELS[payload.mentorPriority] ?? payload.mentorPriority ?? "(미선택)"}`,
+    `- 자녀 성향: ${joinOrEmpty(payload.childPersonality)}`,
+    `- 멘토에게 바라는 점: ${emptyFallback(payload.mentorPriority)}`,
     `- 기타 참고사항: ${emptyFallback(payload.extraNote)}`,
   ].join("\n");
 }
@@ -68,13 +47,13 @@ function makeHtmlBody(payload: ApplicationPayload) {
     ["학부모님 성함", emptyFallback(payload.parentName)],
     ["연락처", emptyFallback(payload.phone)],
     ["학년", emptyFallback(payload.grade)],
-    ["도움이 필요한 과목", toLabel(payload.subjects, SUBJECT_LABELS) || "(미선택)"],
+    ["도움이 필요한 과목", joinOrEmpty(payload.subjects)],
     ["현재 성적·수준", emptyFallback(payload.currentLevel)],
     ["어려워하는 부분", emptyFallback(payload.difficulties)],
     ["목표", emptyFallback(payload.goal)],
     ["목표 시점", emptyFallback(payload.goalDate)],
-    ["자녀 성향", toLabel(payload.childPersonality, PERSONALITY_LABELS) || "(미선택)"],
-    ["멘토에게 바라는 점", MENTOR_PRIORITY_LABELS[payload.mentorPriority] ?? payload.mentorPriority ?? "(미선택)"],
+    ["자녀 성향", joinOrEmpty(payload.childPersonality)],
+    ["멘토에게 바라는 점", emptyFallback(payload.mentorPriority)],
     ["기타 참고사항", emptyFallback(payload.extraNote)],
   ];
 

@@ -26,27 +26,6 @@ const STATUS_COLORS: Record<ApplicationStatus, string> = {
   spam: "bg-red-100 text-red-800",
 };
 
-const SUBJECT_LABELS: Record<string, string> = {
-  math: "수학",
-  science: "과학",
-};
-
-const PERSONALITY_LABELS: Record<string, string> = {
-  introverted: "내성적",
-  extroverted: "외향적",
-  easily_tired: "쉽게 지침",
-  perfectionist: "완벽주의",
-  talkative: "말 많음",
-  quiet: "조용함",
-};
-
-const MENTOR_PRIORITY_LABELS: Record<string, string> = {
-  concept: "개념·문제풀이",
-  routine: "공부 루틴",
-  motivation: "멘탈·동기부여",
-  career: "진로·대학",
-};
-
 function formatDate(iso: string) {
   const d = new Date(iso);
   return d.toLocaleString("ko-KR", {
@@ -57,8 +36,8 @@ function formatDate(iso: string) {
   });
 }
 
-function labelize(values: string[], dict: Record<string, string>) {
-  return values.map((v) => dict[v] ?? v).join(", ");
+function joinValues(values: string[]) {
+  return values.length > 0 ? values.join(", ") : "";
 }
 
 export default function AdminDashboard({
@@ -233,7 +212,7 @@ export default function AdminDashboard({
                         · {app.grade}
                       </span>
                       <span className="text-sm text-slate-600">
-                        · {labelize(app.subjects, SUBJECT_LABELS)}
+                        · {joinValues(app.subjects)}
                       </span>
                     </div>
                   </button>
@@ -246,11 +225,11 @@ export default function AdminDashboard({
                       <DetailRow label="목표 시점" value={app.goal_date} />
                       <DetailRow
                         label="자녀 성향"
-                        value={labelize(app.child_personality, PERSONALITY_LABELS)}
+                        value={joinValues(app.child_personality)}
                       />
                       <DetailRow
                         label="멘토에게 바라는 점"
-                        value={MENTOR_PRIORITY_LABELS[app.mentor_priority] ?? app.mentor_priority}
+                        value={app.mentor_priority}
                       />
                       <DetailRow label="기타" value={app.extra_note} />
 

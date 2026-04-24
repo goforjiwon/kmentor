@@ -18,23 +18,9 @@ import type { ApplicationPayload } from "./email";
  * 토큰이 없거나 만료되면 조용히 실패한다 (이메일·DB 저장은 영향받지 않음).
  */
 
-const SUBJECT_LABELS: Record<string, string> = {
-  math: "수학",
-  science: "과학",
-};
-
-const MENTOR_PRIORITY_LABELS: Record<string, string> = {
-  concept: "개념·문제풀이",
-  routine: "공부 루틴",
-  motivation: "멘탈·동기부여",
-  career: "진로·대학",
-};
-
-function formatMessage(payload: ApplicationPayload, siteUrl: string) {
-  const subjects =
-    payload.subjects.map((s) => SUBJECT_LABELS[s] ?? s).join(", ") || "-";
-  const priority =
-    MENTOR_PRIORITY_LABELS[payload.mentorPriority] ?? payload.mentorPriority ?? "-";
+function formatMessage(payload: ApplicationPayload) {
+  const subjects = payload.subjects.length > 0 ? payload.subjects.join(", ") : "-";
+  const priority = payload.mentorPriority || "-";
 
   return [
     "🎓 카이멘토 신규 신청",
@@ -121,7 +107,7 @@ export async function sendKakaoSelfMessage(payload: ApplicationPayload) {
     return { sent: false, reason: "env_missing" };
   }
 
-  const text = formatMessage(payload, siteUrl);
+  const text = formatMessage(payload);
   const adminUrl = `${siteUrl}/admin`;
 
   // 1차 시도
